@@ -37,7 +37,7 @@ export function loadScript(){
             text-align:center;
         }
         .b{
-            color:blue;
+            color:var(--blike);
         }
         .ix{
             border-radius:5px;

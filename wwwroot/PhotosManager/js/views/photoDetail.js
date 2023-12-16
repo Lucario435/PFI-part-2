@@ -10,12 +10,27 @@ export function get(photo,loggedUser){
         <hr>
         `;
     }
+
+    let likeIconClass = "fa-regular fa-thumbs-up";
+    if(photo.likedByMe){
+        likeIconClass = "fa-solid fa-thumbs-up";
+    }
+    let likeId = "";
+    photo.likes.forEach(element => {
+        if(element.Owner.Id == loggedUser.Id){
+            likeId = element.Id;
+        }
+    });
     return `
     <div class="mcontainer">
     ${userTile}
     <h4 class="htitle">${photo.Title}</h4>
     <img class="ximage" src="${photo.Image}" >
-
+    <br>
+    <span class="pLike" title="${photo.likedBy != undefined ? photo.likedBy : ""}" >${photo.likesCount != undefined? photo.likesCount : "0"}
+     <i lbmId="${likeId}" likedByMe="${photo.likedByMe}" id="clickLike" class="${likeIconClass}"></i> </span>
+    <span class="mdate">${convertToFrenchDate(photo.Date)}</span>
+    <p>${photo.Description}</p>
     </div>
     `;
 }
@@ -44,11 +59,19 @@ export function loadScript(){
         }
         .ximage{
             height:auto;
-            max-width:100%;
+            width:100%;
+            margin-bottom:.5rem;
         }
         .mcontainer{
             margin-left:.5rem;
             margin-right:.5rem;
+        }
+        .mdate{
+            color:var(--blike);
+        }
+        .pLike{
+            float:right;
+            color:var(--blike);
         }
     </style>
     `);
