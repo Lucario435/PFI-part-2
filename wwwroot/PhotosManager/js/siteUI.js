@@ -458,7 +458,7 @@ async function renderPhotosList() {
             })
         })
     })
-
+    UpdateHeader("Liste des photos","photoList");
 }
 async function reloadPhotoObj(photo) {
     let id = photo.Id;
@@ -505,21 +505,23 @@ async function renderPhotoDetail(pid) {
                     $("#clickLike").on("click", function () {
                         let likedByMe = $(this).attr("likedByMe");
                         let lbmId = $(this).attr("lbmId");
-                        if(likedByMe){
+                        if(likedByMe == "true"){
                             API.DeleteLike(lbmId).then(()=>{renderPhotoDetail(pid)})
+                        } else{
+                            API.CreateLike({
+                                OwnerId: loggedUser.Id,
+                                PhotoId: pid,
+                                Date: Math.floor(Date.now() / 1000)
+                            }).then((success) => {
+                                if (success != false) {
+                                    // console.log("success like:" +success)
+                                    console.log(success);
+                                    renderPhotoDetail(pid);
+                                }
+    
+                            })
                         }
-                        API.CreateLike({
-                            OwnerId: loggedUser.Id,
-                            PhotoId: pid,
-                            Date: Math.floor(Date.now() / 1000)
-                        }).then((success) => {
-                            if (success != false) {
-                                // console.log("success like:" +success)
-                                console.log(success);
-                                renderPhotoDetail(pid);
-                            }
-
-                        })
+                        
                     })
                 })
             }
