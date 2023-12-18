@@ -1,7 +1,7 @@
 
 
 export function get(photoList,userdatas,loggedUser,CurrentFilter){
-    let buildstr = `<div class="pgrid">`;
+    let buildstr = `<div class="bigContainer">`;
     //fonction pour filtrer
     switch(CurrentFilter)
     {
@@ -40,64 +40,72 @@ export function get(photoList,userdatas,loggedUser,CurrentFilter){
 
     //Affichage
     photoList.forEach(element => {
-        buildstr += getTilePhoto(element,userdatas,loggedUser);
+        if(element.Shared == false && element.OwnerId != loggedUser.Id)
+        {
+        } else buildstr += getTilePhoto(element,userdatas,loggedUser);
+        
     });
-
-    buildstr += "</div>";
-
-
-
+    buildstr += "</div>"
     return buildstr;
 }
 
 function getTilePhoto(photo,userdatas,loggedUser){
     let accdata = userdatas[photo.OwnerId];
-    let ownerActions = photo.OwnerId != loggedUser.Id ? "" : 
+    let ownerActions = (photo.OwnerId != loggedUser.Id) && (loggedUser.isAdmin == false) ? "" : 
     `
         <div class="pOwnerActions" photoId="${photo.Id}">
         <i class="fa fa-pencil" id="editPhotoCmd"> </i>
         <i class="fa fa-trash" id="deletePhotoCmd"> </i>
         </div>
-    `;
+        
+    `;//<script>alert("${photo.Date}")</script>
     return `
     <div class="tphoto" photoId="${photo.Id}">
         ${ownerActions}
         <p class="pTitle">${photo.Title}</p>
         <div class="photoContainer">
-            ${photo.Shared == undefined || photo.Shared == false? "": `
+            ${photo.Shared == false || photo.OwnerId != loggedUser.Id ? "": `
             <img class="pShared pIcon" src="././images/shared.png">
             `}
             <img class="pOwner pIcon" src="${accdata.Avatar}">
             <img class="pImg" src="${photo.Image}">
         </div>
         <span class="pLike">${photo.likesCount != undefined? photo.likesCount : "0"} <i class="fa-regular fa-thumbs-up"></i> </span>
-        <span class="pDate">${convertToFrenchDate(photo.Date)}</span>
+        <span class="pDate">${convertToFrenchDate(photo.Date*1000)}</span>
     </div>
     `;
 }
 
-export function loadScript(renderPhotoDetail){
+export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
     $(".photoContainer").on("click",function(){
         let balise = $(this);
         let pid = balise.parent().attr("photoId")
         // console.log(pid);
         renderPhotoDetail(pid);
     })
-    
 
     $("#content").append($(`
     <style>
+        .bigContainer{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            /*justify-content: center;*/
+          
+        }
         .pImg{
             width:100%;
-            height:300px;
+            height:100%;
             object-fit: cover;
         }
         .pOwnerActions{
             float:right;
         }
         .tphoto{
-            width:100%;
-            color:blue;
+            width:250px;
+            height:250px;
+            color:var(--blike);
+            margin-bottom:4rem;
             margin-left:.5rem;
             margin-right:.5rem;
             border-radius:5px;
@@ -118,6 +126,7 @@ export function loadScript(renderPhotoDetail){
         .photoContainer{
             position:relative;
             cursor:pointer;
+            height:100%;
         }
         .pOwner{
             width:3rem;

@@ -60,8 +60,8 @@
         "Created": 1702589492,
         "VerifyCode": "verified",
         "Authorizations": {
-            "readAccess": 1,
-            "writeAccess": 1
+            "readAccess": 2,
+            "writeAccess": 2
         }
     },
     {
