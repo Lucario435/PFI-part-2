@@ -120,6 +120,7 @@ function viewMenu(viewName) {
 }
 function connectedUserAvatar() {
     let loggedUser = API.retrieveLoggedUser();
+    // console.log(loggedUser);
     if (loggedUser)
         return `
             <div class="UserAvatarSmall" userId="${loggedUser.Id}" id="editProfilCmd" style="background-image:url('${loggedUser.Avatar}')" title="${loggedUser.Name}"></div>
@@ -308,12 +309,14 @@ async function renderEditPhoto(msg = undefined, pid) {
                 initFormValidation();
                 initImageUploaders();
                 lsCreatePhoto();
+                UpdateHeader("Modifier la photo");
+                $("#newPhotoCmd").hide();
                 $("#formCPhoto").on("submit", function (e) {
                     e.preventDefault();
                     let loggedUser = API.retrieveLoggedUser();
                     let datas = getFormData($("#formCPhoto"));
                     let created = {
-                        Id: photo.Id, OwnerId: loggedUser.Id, Title: datas.Title,
+                        Id: photo.Id, OwnerId: photo.OwnerId, Title: datas.Title,
                         Description: datas.Description, Image: datas.Photo,
                         Shared: datas.shared ? true : false, Date: Math.floor(Date.now() / 1000)
                     };
@@ -437,7 +440,7 @@ async function renderPhotosList() {
         r.data.forEach(photo => {
             let udata = undefined;
             udata = photo.Owner; //API.GetAccount(photo.OwnerId)
-            userdatas[photo.OwnerId] = udata;
+            userdatas[photo.Owner.Id] = udata;
         });
     }
     let nphotos = [];
@@ -445,10 +448,11 @@ async function renderPhotosList() {
         reloadPhotoObj(e).then(s => {
             nphotos.push(s);
             $("#content").html(getPhotos(nphotos, userdatas, loggedUser));
-            lsPhotos(renderPhotoDetail, renderDeletePhoto);
+            lsPhotos(renderPhotoDetail, renderDeletePhoto,renderEditPhoto);
             $("#editPhotoCmd").on("click", function () {
                 let balise = $(this);
                 let pid = balise.parent().attr("photoId")
+                console.log("ahhae");
                 renderEditPhoto(undefined, pid);
             })
             $("#deletePhotoCmd").on("click", function () {
@@ -456,9 +460,16 @@ async function renderPhotosList() {
                 let pid = balise.parent().attr("photoId")
                 renderDeletePhoto(pid);
             })
+            $("#content").on("click", "#editPhotoCmd", function (){
+                let balise = $(this);
+                let pid = balise.parent().attr("photoId")
+                console.log("ahhae");
+                renderEditPhoto(undefined, pid);
+            })
         })
     })
     UpdateHeader("Liste des photos","photoList");
+    $("#newPhotoCmd").show();
 }
 async function reloadPhotoObj(photo) {
     let id = photo.Id;
@@ -502,6 +513,8 @@ async function renderPhotoDetail(pid) {
                 reloadPhotoObj(photo).then((nphoto) => {
                     $("#content").html(getPhotoDetail(nphoto, loggedUser));
                     lsPhotoDetail();
+                    UpdateHeader("Détails","detail");
+                    $("#newPhotoCmd").hide();
                     $("#clickLike").on("click", function () {
                         let likedByMe = $(this).attr("likedByMe");
                         let lbmId = $(this).attr("lbmId");
@@ -537,6 +550,8 @@ async function renderDeletePhoto(pid) {
                 let loggedUser = API.retrieveLoggedUser();
                 $("#content").html(getDeletePhoto(photo));
                 lsDeletePhoto();
+                UpdateHeader("Supprimer la photo");
+                $("#newPhotoCmd").hide();
                 $("#formCPhoto").on("submit", function (e) {
                     e.preventDefault();
                     API.DeletePhoto(pid).then((succ) => {

@@ -5,7 +5,7 @@ export function get(msg = undefined,EditPhoto = {}){
     let Description = EditPhoto.Description;
     let Shared = EditPhoto.Shared;
     let Image = EditPhoto.Image;
-    console.log(Image);
+    // console.log(Image);
     return `
     <form class="form" id="formCPhoto">
         ${msg != undefined ? '<h4 style="color:red;">'+msg+'</h4>':"" }

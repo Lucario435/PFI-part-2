@@ -1,7 +1,7 @@
 
 export function get(photo,loggedUser){
-    let userTile = "";
-    if(loggedUser.Id == photo.Owner.Id){
+    let userTile = "<div style='margin-top:.5rem;'></div>";
+    if(loggedUser.Id != photo.Owner.Id){
         userTile = `
         <div class="dutile">
         <img src="${photo.Owner.Avatar}">
@@ -29,7 +29,7 @@ export function get(photo,loggedUser){
     <br>
     <span class="pLike" title="${photo.likedBy != undefined ? photo.likedBy : ""}" >${photo.likesCount != undefined? photo.likesCount : "0"}
      <i lbmId="${likeId}" likedByMe="${photo.likedByMe}" id="clickLike" class="${likeIconClass}"></i> </span>
-    <span class="mdate">${convertToFrenchDate(photo.Date)}</span>
+    <span class="mdate">${convertToFrenchDate(photo.Date*1000)}</span>
     <p>${photo.Description}</p>
     </div>
     `;
