@@ -1,7 +1,7 @@
-import { get as getPhotos, loadScript as lsPhotos} from "./views/listPhotos.js";
-import { get as getCreatePhoto, loadScript as lsCreatePhoto} from "./views/createPhoto.js";
-import { get as getPhotoDetail, loadScript as lsPhotoDetail} from "./views/photoDetail.js";
-import { get as getDeletePhoto, loadScript as lsDeletePhoto} from "./views/deletePhoto.js";
+import { get as getPhotos, loadScript as lsPhotos } from "./views/listPhotos.js";
+import { get as getCreatePhoto, loadScript as lsCreatePhoto } from "./views/createPhoto.js";
+import { get as getPhotoDetail, loadScript as lsPhotoDetail } from "./views/photoDetail.js";
+import { get as getDeletePhoto, loadScript as lsDeletePhoto } from "./views/deletePhoto.js";
 
 //<span class="cmdIcon fa-solid fa-ellipsis-vertical"></span>
 let contentScrollPosition = 0;
@@ -332,36 +332,70 @@ function saveContentScrollPosition() {
 function restoreContentScrollPosition() {
     $("#content")[0].scrollTop = contentScrollPosition;
 }
-function renderCreatePhoto(msg = undefined){
+function renderCreatePhoto(msg = undefined) {
     eraseContent();
     $("#content").html(getCreatePhoto(msg));
     lsCreatePhoto();
-    UpdateHeader("Créer une photo","createPhoto");
+    UpdateHeader("Créer une photo", "createPhoto");
     initImageUploaders();
     initFormValidation();
-    $("#formCPhoto").on("submit",function(e){
+    $("#formCPhoto").on("submit", function (e) {
         e.preventDefault();
         let loggedUser = API.retrieveLoggedUser();
         let datas = getFormData($("#formCPhoto"));
-        let created = {OwnerId: loggedUser.Id,Title:datas.Title,
-        Description:datas.Description,Image:datas.Photo,
-        Shared:datas.shared?true:false,Date:Math.floor(Date.now() / 1000)};
+        let created = {
+            OwnerId: loggedUser.Id, Title: datas.Title,
+            Description: datas.Description, Image: datas.Photo,
+            Shared: datas.shared ? true : false, Date: Math.floor(Date.now() / 1000)
+        };
         // console.log("submit");
         console.log(created);
         createPhoto(created);
     })
-    $("#abortCmd").on("click",function(){
+    $("#abortCmd").on("click", function () {
         renderPhotosList();
     })
 }
-async function createPhoto(photoData){
-    if(photoData.Image == ""){
+async function renderEditPhoto(msg = undefined, pid) {
+    let r = await API.GetPhotos();
+    if (r.data) {
+        r.data.forEach(photo => {
+            if (photo.Id == pid) {
+                eraseContent();
+                let loggedUser = API.retrieveLoggedUser();
+                $("#content").html(getCreatePhoto(msg, photo, loggedUser));
+                initFormValidation();
+                initImageUploaders();
+                lsCreatePhoto();
+                $("#formCPhoto").on("submit", function (e) {
+                    e.preventDefault();
+                    let loggedUser = API.retrieveLoggedUser();
+                    let datas = getFormData($("#formCPhoto"));
+                    let created = {
+                        Id: photo.Id, OwnerId: loggedUser.Id, Title: datas.Title,
+                        Description: datas.Description, Image: datas.Photo,
+                        Shared: datas.shared ? true : false, Date: Math.floor(Date.now() / 1000)
+                    };
+                    API.UpdatePhoto(created).then((succ) => {
+                        if (succ) renderPhotosList();
+                        else renderError("Une erreur est survenue dans la mise à jour de la photo");
+                    })
+                })
+                $("#abortCmd").on("click", function () {
+                    renderPhotosList();
+                })
+            }
+        });
+    }
+}
+async function createPhoto(photoData) {
+    if (photoData.Image == "") {
         renderCreatePhoto("Une image est obligatoire");
         return;
     }
-    if(await API.CreatePhoto(photoData)){
+    if (await API.CreatePhoto(photoData)) {
         renderPhotos();
-    } else{
+    } else {
         renderCreatePhoto("Une erreur est survenue");
     }
 }
@@ -381,7 +415,7 @@ async function renderError(message) {
     }
     saveContentScrollPosition();
     eraseContent();
-    
+
     $("#newPhotoCmd").hide();
     $("#content").append(
         $(`
@@ -417,7 +451,7 @@ function renderAbout() {
     timeout();
     saveContentScrollPosition();
     eraseContent();
-    
+
     $("#newPhotoCmd").hide();
     $("#createContact").hide();
     $("#abort").show();
@@ -438,7 +472,7 @@ function renderAbout() {
                 </p>
             </div>
         `))
-        UpdateHeader("À propos...", "about");
+    UpdateHeader("À propos...", "about");
 }
 async function renderPhotos() {
     timeout();
@@ -458,57 +492,119 @@ async function renderPhotosList() {
     let r = await API.GetPhotos();
     let loggedUser = API.retrieveLoggedUser();
     let userdatas = {};
-    if(r.data){
+    if (r.data) {
         r.data.forEach(photo => {
             let udata = undefined;
             udata = photo.Owner; //API.GetAccount(photo.OwnerId)
             userdatas[photo.OwnerId] = udata;
         });
     }
-
-    $("#content").html(getPhotos(r.data,userdatas,loggedUser,CurrentFilter));
-    lsPhotos(renderPhotoDetail,renderDeletePhoto);
-    $("#editPhotoCmd").on("click",function(){
-        let balise = $(this);
-        let pid = balise.parent().attr("photoId")
+    let nphotos = [];
+    r.data.forEach(e => {
+        reloadPhotoObj(e).then(s => {
+            nphotos.push(s);
+            $("#content").html(getPhotos(nphotos, userdatas, loggedUser, CurrentFilter));
+            lsPhotos(renderPhotoDetail, renderDeletePhoto);
+            $("#editPhotoCmd").on("click", function () {
+                let balise = $(this);
+                let pid = balise.parent().attr("photoId")
+                renderEditPhoto(undefined, pid);
+            })
+            $("#deletePhotoCmd").on("click", function () {
+                let balise = $(this);
+                let pid = balise.parent().attr("photoId")
+                renderDeletePhoto(pid);
+            })
+        })
     })
-    $("#deletePhotoCmd").on("click",function(){
-        let balise = $(this);
-        let pid = balise.parent().attr("photoId")
-        renderDeletePhoto(pid);
-    })
+    UpdateHeader("Liste des photos","photoList");
 }
-async function renderPhotoDetail(pid){
+async function reloadPhotoObj(photo) {
+    let id = photo.Id;
+    return new Promise(async resolve => {
+        let likes = await API.loadLikesFor(id);
+        let loggedUser = API.retrieveLoggedUser();
+        if (likes != undefined) {
+            let xlikes = likes;
+
+            photo.likes = xlikes;
+            photo.likesCount = xlikes.length;
+            photo.likedBy = "";
+            photo.likedByMe = undefined;
+
+            let countLikeBy = 0;
+            xlikes.forEach((element) => {
+                let u = element.Owner;
+                if(u.Id == loggedUser.Id){
+                    photo.likedByMe=true;
+                }
+                if (u != undefined && countLikeBy <10) {
+                    photo.likedBy += u.Name + "\n";
+                    countLikeBy+=1;
+                }
+            });
+            // console.log(photo);
+            resolve(photo);
+        } else {
+            resolve(photo);
+        }
+    });
+}
+async function renderPhotoDetail(pid) {
     let r = await API.GetPhotos();
-    if(r.data){
+    if (r.data) {
         r.data.forEach(photo => {
-            if(photo.Id == pid){
+            if (photo.Id == pid) {
                 eraseContent();
+
                 let loggedUser = API.retrieveLoggedUser();
-                $("#content").html(getPhotoDetail(photo,loggedUser));
-                lsPhotoDetail();
+                reloadPhotoObj(photo).then((nphoto) => {
+                    $("#content").html(getPhotoDetail(nphoto, loggedUser));
+                    lsPhotoDetail();
+                    $("#clickLike").on("click", function () {
+                        let likedByMe = $(this).attr("likedByMe");
+                        let lbmId = $(this).attr("lbmId");
+                        if(likedByMe == "true"){
+                            API.DeleteLike(lbmId).then(()=>{renderPhotoDetail(pid)})
+                        } else{
+                            API.CreateLike({
+                                OwnerId: loggedUser.Id,
+                                PhotoId: pid,
+                                Date: Math.floor(Date.now() / 1000)
+                            }).then((success) => {
+                                if (success != false) {
+                                    // console.log("success like:" +success)
+                                    console.log(success);
+                                    renderPhotoDetail(pid);
+                                }
+    
+                            })
+                        }
+                        
+                    })
+                })
             }
         });
     }
 }
-async function renderDeletePhoto(pid){
+async function renderDeletePhoto(pid) {
     let r = await API.GetPhotos();
-    if(r.data){
+    if (r.data) {
         r.data.forEach(photo => {
-            if(photo.Id == pid){
+            if (photo.Id == pid) {
                 eraseContent();
                 let loggedUser = API.retrieveLoggedUser();
                 $("#content").html(getDeletePhoto(photo));
                 lsDeletePhoto();
-                $("#formCPhoto").on("submit",function(e){
+                $("#formCPhoto").on("submit", function (e) {
                     e.preventDefault();
-                    API.DeletePhoto(pid).then((succ)=>{
-                        if(succ){
+                    API.DeletePhoto(pid).then((succ) => {
+                        if (succ) {
                             renderPhotosList();
                         } else renderError("Erreur dans la suppression");
                     });
                 })
-                $("#abortCmd").on("click",function(){
+                $("#abortCmd").on("click", function () {
                     renderPhotosList();
                 })
             }
@@ -517,7 +613,7 @@ async function renderDeletePhoto(pid){
 }
 function renderVerify() {
     eraseContent();
-    
+
     $("#newPhotoCmd").hide();
     $("#content").append(`
         <div class="content">

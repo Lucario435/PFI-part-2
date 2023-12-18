@@ -47,7 +47,9 @@
     font-weight: bold;
     color:rgb(0, 87, 204);
 }
-
+:root{
+    --blike:rgb(0, 87, 204);
+}
 .photoDetailsOwner {
     display:grid;
     grid-template-columns: 50px auto;

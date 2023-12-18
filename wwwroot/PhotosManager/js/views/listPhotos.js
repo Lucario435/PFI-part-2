@@ -64,14 +64,14 @@ function getTilePhoto(photo,userdatas,loggedUser){
         ${ownerActions}
         <p class="pTitle">${photo.Title}</p>
         <div class="photoContainer">
-            ${photo.Shared == undefined? "": `
+            ${photo.Shared == undefined || photo.Shared == false? "": `
             <img class="pShared pIcon" src="././images/shared.png">
             `}
             <img class="pOwner pIcon" src="${accdata.Avatar}">
             <img class="pImg" src="${photo.Image}">
         </div>
-        <span class="pLike"> </span>
-        <p class="pDate">${convertToFrenchDate(photo.Date)}</p>
+        <span class="pLike">${photo.likesCount != undefined? photo.likesCount : "0"} <i class="fa-regular fa-thumbs-up"></i> </span>
+        <span class="pDate">${convertToFrenchDate(photo.Date)}</span>
     </div>
     `;
 }
@@ -140,7 +140,7 @@ export function loadScript(renderPhotoDetail){
             outline:solid 2px white;
         }
         .pLike{
-
+            float:right;
         }
         .pDate{
             width:100%;
