@@ -10,7 +10,7 @@ let keywords = "";
 let loginMessage = "";
 let Email = "";
 let EmailError = "";
-let CurrentFilter = "date";
+let CurrentFilter = "";
 let passwordError = "";
 let currentETag = "";
 let currentViewName = "photosList";
@@ -86,9 +86,10 @@ function changeFilter(filter, element)
 
         //Rendu de la page des images
         renderPhotos();
+
         //Check mis à jour
-        let currentElement = document.getElementById(element);
         deselectAll();
+        let currentElement = document.getElementById(element);
         $(currentElement).find("i.fa-fw").replaceWith($(`<i class="menuIcon fa fa-check mx-2"></i>`));
     }
     else
@@ -154,7 +155,7 @@ function loggedUserMenu() {
             <span class="dropdown-item hfiltre" id="sortByLikesCmd">
                 <i class="menuIcon fa fa-fw mx-2"></i>
                 <i class="menuIcon fa fa-user mx-2"></i>
-                Photos les plus aiméés
+                Photos les plus aimées
             </span>
             <span class="dropdown-item hfiltre" id="ownerOnlyCmd">
                 <i class="menuIcon fa fa-fw mx-2"></i>
@@ -480,8 +481,9 @@ async function renderPhotos() {
     $("#newPhotoCmd").show();
     $("#abort").hide();
     let loggedUser = API.retrieveLoggedUser();
-    if (loggedUser)
+    if (loggedUser){
         renderPhotosList();
+    }
     else {
         renderLoginForm();
     }
@@ -517,7 +519,7 @@ async function renderPhotosList() {
             })
         })
     })
-    UpdateHeader("Liste des photos","photoList");
+   //UpdateHeader("Liste des photos","photoList");
 }
 async function reloadPhotoObj(photo) {
     let id = photo.Id;
