@@ -4,18 +4,17 @@ export function get(photo,loggedUser){
     if(loggedUser.Id == photo.Owner.Id){
         userTile = `
         <div class="dutile">
-        <img src="${photo.Owner.Avatar}">
-        <span>${photo.Owner.Name}</span>
+            <img src="${photo.Owner.Avatar}">
+            <span>${photo.Owner.Name}</span>
         </div>
         <hr>
         `;
     }
     return `
     <div class="mcontainer">
-    ${userTile}
-    <h4 class="htitle">${photo.Title}</h4>
-    <img class="ximage" src="${photo.Image}" >
-
+        ${userTile}
+        <h4 class="htitle">${photo.Title}</h4>
+        <img class="ximage" src="${photo.Image}" >
     </div>
     `;
 }
@@ -43,8 +42,10 @@ export function loadScript(){
             font-size:1.5rem;
         }
         .ximage{
-            height:auto;
-            max-width:100%;
+            border-radius:5px;
+            object-fit: cover;
+            width:100%;
+            padding:1em;
         }
         .mcontainer{
             margin-left:.5rem;

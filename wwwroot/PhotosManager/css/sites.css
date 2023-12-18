@@ -108,7 +108,9 @@
     height: 40px;
     margin-right: 10px;
 }
-
+.appLogo:hover{
+    cursor: pointer;
+}
 @media screen and (min-width:650px) {
 
     .UserInfo {

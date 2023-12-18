@@ -5,11 +5,12 @@ import { get as getDeletePhoto, loadScript as lsDeletePhoto} from "./views/delet
 
 //<span class="cmdIcon fa-solid fa-ellipsis-vertical"></span>
 let contentScrollPosition = 0;
-let sortType = "date";
+let sortType = "";
 let keywords = "";
 let loginMessage = "";
 let Email = "";
 let EmailError = "";
+let CurrentFilter = "date";
 let passwordError = "";
 let currentETag = "";
 let currentViewName = "photosList";
@@ -68,6 +69,38 @@ function installWindowResizeHandler() {
         }
     });
 }
+
+////////////////////////////////////////////////////
+//FUNCTIONS FOR FILTERS
+function deselectAll(){
+    $("i.fa-check").replaceWith($(`<i class="menuIcon fa fa-fw mx-2"></i>`));
+}
+function changeFilter(filter, element)
+{
+    //Avant de changer le fa check, si on reclique sur le même on retire le filtre
+    if(CurrentFilter != filter)
+    {
+        console.log(filter);
+        //Changer la variable du filtre
+        CurrentFilter = filter;
+
+        //Rendu de la page des images
+        renderPhotos();
+        //Check mis à jour
+        let currentElement = document.getElementById(element);
+        deselectAll();
+        $(currentElement).find("i.fa-fw").replaceWith($(`<i class="menuIcon fa fa-check mx-2"></i>`));
+    }
+    else
+    {
+        CurrentFilter = "";
+        deselectAll();
+        renderPhotos();
+    }
+}
+//FUNCTIONS FOR FILTERS
+////////////////////////////////////////////////////
+
 function attachCmd() {
     $('#loginCmd').on('click', renderLoginForm);
     $('#logoutCmd').on('click', logout);
@@ -78,6 +111,10 @@ function attachCmd() {
     $('#editProfilCmd').on('click', renderEditProfilForm);
     $('#aboutCmd').on("click", renderAbout);
     $("#newPhotoCmd").on("click",()=>{renderCreatePhoto()});
+    $("#sortByDateCmd").on("click",()=>{changeFilter("date","sortByDateCmd")});
+    $("#sortByOwnersCmd").on("click",()=>{changeFilter("creator","sortByOwnersCmd")});
+    $("#sortByLikesCmd").on("click",()=>{changeFilter("like","sortByLikesCmd")});
+    $("#ownerOnlyCmd").on("click",()=>{changeFilter("own", "ownerOnlyCmd")});
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Header management
@@ -101,6 +138,28 @@ function loggedUserMenu() {
             <div class="dropdown-divider"></div>
             <span class="dropdown-item" id="listPhotosMenuCmd">
                 <i class="menuIcon fa fa-image mx-2"></i> Liste des photos
+            </span>
+            
+            <div class="dropdown-divider"></div>
+            <span class="dropdown-item hfiltre" id="sortByDateCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-calendar mx-2"></i>
+                Photos par date de création
+            </span>
+            <span class="dropdown-item hfiltre" id="sortByOwnersCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-users mx-2"></i>
+                Photos par créateur
+            </span>
+            <span class="dropdown-item hfiltre" id="sortByLikesCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-user mx-2"></i>
+                Photos les plus aiméés
+            </span>
+            <span class="dropdown-item hfiltre" id="ownerOnlyCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-user mx-2"></i>
+                Mes photos
             </span>
         `;
     }
@@ -406,7 +465,8 @@ async function renderPhotosList() {
             userdatas[photo.OwnerId] = udata;
         });
     }
-    $("#content").html(getPhotos(r.data,userdatas,loggedUser));
+
+    $("#content").html(getPhotos(r.data,userdatas,loggedUser,CurrentFilter));
     lsPhotos(renderPhotoDetail,renderDeletePhoto);
     $("#editPhotoCmd").on("click",function(){
         let balise = $(this);

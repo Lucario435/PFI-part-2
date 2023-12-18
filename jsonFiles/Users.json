@@ -63,5 +63,18 @@
             "readAccess": 1,
             "writeAccess": 1
         }
+    },
+    {
+        "Id": "2e19dc60-9c44-11ee-8f6f-25bc092854c0",
+        "Email": "jobillette@hotmail.com",
+        "Password": "123456",
+        "Name": "Jonathan",
+        "Avatar": "2e19dc61-9c44-11ee-8f6f-25bc092854c0.jpeg",
+        "Created": 1702752714,
+        "VerifyCode": "verified",
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
     }
 ]
