@@ -552,6 +552,11 @@ async function renderPhotosList() {
                 // console.log("ahhae");
                 renderEditPhoto(undefined, pid);
             })
+            $("#content").on("click", "#deletePhotoCmd", function (){
+                let balise = $(this);
+                let pid = balise.parent().attr("photoId")
+                renderDeletePhoto(pid);
+            })
             $("#newPhotoCmd").show();
     
     let realcurrphoto = max(countPhotos,limitPagination);
