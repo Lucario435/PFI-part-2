@@ -76,5 +76,18 @@
             "readAccess": 2,
             "writeAccess": 2
         }
+    },
+    {
+        "Id": "b9c44340-9db6-11ee-82d7-2323914e33fe",
+        "Email": "jobillette@gmail.com",
+        "Password": "123456",
+        "Name": "Paramount",
+        "Avatar": "b9c61800-9db6-11ee-82d7-2323914e33fe.jpeg",
+        "Created": 1702911862,
+        "VerifyCode": "verified",
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
     }
 ]

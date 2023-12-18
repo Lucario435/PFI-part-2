@@ -40,10 +40,19 @@ export function get(photoList,userdatas,loggedUser,CurrentFilter){
 
     //Affichage
     photoList.forEach(element => {
+<<<<<<< Updated upstream
         if(element.Shared == false && element.OwnerId != loggedUser.Id)
         {
         } else buildstr += getTilePhoto(element,userdatas,loggedUser);
         
+=======
+        console.log(element);
+        //Vérifier si les annonces sont partagé ou à nous
+        if(element.Shared == true || element.OwnerName == loggedUser.Name)
+        {
+            buildstr += getTilePhoto(element,userdatas,loggedUser);
+        }
+>>>>>>> Stashed changes
     });
     buildstr += "</div>"
     return buildstr;
