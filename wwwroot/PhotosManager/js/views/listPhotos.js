@@ -87,13 +87,11 @@ export function loadScript(renderPhotoDetail){
 
     $("#content").append($(`
     <style>
-        .fa-thumbs-up{
-            cursor:pointer;
-        }
         .pImg{
             width:100%;
             height:300px;
             object-fit: cover;
+            border-radius:5px;
         }
         .pOwnerActions{
             float:right;
@@ -106,7 +104,7 @@ export function loadScript(renderPhotoDetail){
         }
         .tphoto{
             width:100%;
-            color:blue;
+            color:rgb(0, 87, 204);
             margin-left:.5rem;
             margin-right:.5rem;
             border-radius:5px;
@@ -123,6 +121,7 @@ export function loadScript(renderPhotoDetail){
         }
         .pTitle{
             font-weight:bold;
+            color:rgb(0, 87, 204);
         }
         .photoContainer{
             position:relative;
@@ -150,10 +149,12 @@ export function loadScript(renderPhotoDetail){
         }
         .pLike{
             float:right;
+            color:rgb(0, 87, 204);
         }
         .pDate{
             width:100%;
             font-size:.8rem;
+            color:rgb(0, 87, 204);
         }
     </style>
     
