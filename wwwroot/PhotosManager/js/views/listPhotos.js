@@ -87,6 +87,9 @@ export function loadScript(renderPhotoDetail){
 
     $("#content").append($(`
     <style>
+        .fa-thumbs-up{
+            cursor:pointer;
+        }
         .pImg{
             width:100%;
             height:300px;
@@ -94,6 +97,12 @@ export function loadScript(renderPhotoDetail){
         }
         .pOwnerActions{
             float:right;
+        }
+        .fa-pencil{
+            cursor:pointer;
+        }
+        .fa-trash{
+            cursor:pointer;
         }
         .tphoto{
             width:100%;
