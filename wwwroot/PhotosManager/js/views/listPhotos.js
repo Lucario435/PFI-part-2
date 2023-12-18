@@ -74,7 +74,7 @@ function getTilePhoto(photo,userdatas,loggedUser){
             <img class="pShared pIcon" src="././images/shared.png">
             `}
             <img class="pOwner pIcon" src="${accdata.Avatar}">
-            <img class="pImg" src="${photo.Image}">
+            <img title="Voir les détails" class="pImg" src="${photo.Image}">
         </div>
         <span class="pLike">${photo.likesCount != undefined? photo.likesCount : "0"} <i class="fa-regular fa-thumbs-up"></i> </span>
         <span class="pDate">${convertToFrenchDate(photo.Date*1000)}</span>
@@ -104,7 +104,11 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
             height:300px;
             object-fit: cover;
             border-radius:5px;
-        }.centerx{
+        }
+        .pImg:hover{
+            filter: brightness(80%);
+        }
+        .centerx{
             margin-right:auto;
             margin-left:auto;
             width:fit-content;

@@ -16,7 +16,7 @@ let currentETag = "";
 let currentViewName = "photosList";
 let currentViewTitle = "";
 let delayTimeOut = 200; // seconds
-
+let currentElement = "";
 // pour la pagination
 let photoContainerWidth = 400;
 let photoContainerHeight = 400;
@@ -61,9 +61,7 @@ function installWindowResizeHandler() {
             $(window).trigger('resizeend');
         }, resizeEndTriggerDelai);
     }).on('resizestart', function () {
-        console.log('resize start');
     }).on('resizeend', function () {
-        console.log('resize end');
         if ($('#photosLayout') != null) {
             getViewPortPhotosRanges();
             if (currentViewName == "photosList")
@@ -82,21 +80,19 @@ function changeFilter(filter, element)
     //Avant de changer le fa check, si on reclique sur le même on retire le filtre
     if(CurrentFilter != filter)
     {
-        console.log(filter);
         //Changer la variable du filtre
         CurrentFilter = filter;
-
+        currentElement = element;
         //Rendu de la page des images
         renderPhotos();
 
         //Check mis à jour
         deselectAll();
-        let currentElement = document.getElementById(element);
-        $(currentElement).find("i.fa-fw").replaceWith($(`<i class="menuIcon fa fa-check mx-2"></i>`));
     }
     else
     {
         CurrentFilter = "";
+        currentElement = "";
         deselectAll();
         renderPhotos();
     }
@@ -142,28 +138,28 @@ function loggedUserMenu() {
             <span class="dropdown-item" id="listPhotosMenuCmd">
                 <i class="menuIcon fa fa-image mx-2"></i> Liste des photos
             </span>
-            
-            <div class="dropdown-divider"></div>
+            ${currentViewName == "photoList" ? 
+            `<div class="dropdown-divider"></div>
             <span class="dropdown-item hfiltre" id="sortByDateCmd">
-                <i class="menuIcon fa fa-fw mx-2"></i>
+                ${currentElement == "sortByDateCmd" ? `<i class="menuIcon fa fa-check mx-2"></i>` : `<i class="menuIcon fa fa-fw mx-2"></i>`}
                 <i class="menuIcon fa fa-calendar mx-2"></i>
                 Photos par date de création
             </span>
             <span class="dropdown-item hfiltre" id="sortByOwnersCmd">
-                <i class="menuIcon fa fa-fw mx-2"></i>
+                ${currentElement == "sortByOwnersCmd" ? `<i class="menuIcon fa fa-check mx-2"></i>` : `<i class="menuIcon fa fa-fw mx-2"></i>`}
                 <i class="menuIcon fa fa-users mx-2"></i>
                 Photos par créateur
             </span>
             <span class="dropdown-item hfiltre" id="sortByLikesCmd">
-                <i class="menuIcon fa fa-fw mx-2"></i>
+                ${currentElement == "sortByLikesCmd" ? `<i class="menuIcon fa fa-check mx-2"></i>` : `<i class="menuIcon fa fa-fw mx-2"></i>`}
                 <i class="menuIcon fa fa-user mx-2"></i>
                 Photos les plus aimées
             </span>
             <span class="dropdown-item hfiltre" id="ownerOnlyCmd">
-                <i class="menuIcon fa fa-fw mx-2"></i>
+                ${currentElement == "ownerOnlyCmd" ? `<i class="menuIcon fa fa-check mx-2"></i>` : `<i class="menuIcon fa fa-fw mx-2"></i>`}
                 <i class="menuIcon fa fa-user mx-2"></i>
                 Mes photos
-            </span>
+            </span>` : ""}
         `;
     }
     else
@@ -182,7 +178,6 @@ function viewMenu(viewName) {
 }
 function connectedUserAvatar() {
     let loggedUser = API.retrieveLoggedUser();
-    console.log(loggedUser);
     if (loggedUser)
         return `
             <div class="UserAvatarSmall" userId="${loggedUser.Id}" id="editProfilCmd" style="background-image:url('${loggedUser.Avatar}')" title="${loggedUser.Name}"></div>
@@ -238,7 +233,6 @@ function UpdateHeader(viewTitle, viewName) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Actions and command
 async function login(credential) {
-    console.log("login");
     loginMessage = "";
     EmailError = "";
     passwordError = "";
@@ -485,10 +479,9 @@ async function renderPhotos() {
     showWaitingGif();
     $("#newPhotoCmd").show();
     $("#abort").hide();
-    currPage =0;
+    currPage = 0;
     let loggedUser = API.retrieveLoggedUser();
     if (loggedUser){
-        console.log(loggedUser);
         renderPhotosList();
     }
     else {
@@ -506,15 +499,14 @@ function max(a,maxx){
     return a;
 }
 function getCurrPage(){
-    if(currPage <0)
-        currPage =0;
+    if(currPage < 0)
+        currPage = 0;
     return currPage;
 }
 async function renderPhotosList() {
     eraseContent();
     let query = `?&limit=${limitPagination}&offset=${getCurrPage()}`;
     // alert(query);
-    console.log(query);
     let r = await API.GetPhotos(query);
     let loggedUser = API.retrieveLoggedUser();
     // if(true){
@@ -577,8 +569,7 @@ async function renderPhotosList() {
     }
         })
     })
-    
-    // UpdateHeader("Liste des photos","photoList");
+    UpdateHeader("Liste des photos","photoList");
     
 }
 $("#content").on("click","#previousPage",function(){
@@ -592,7 +583,6 @@ $("#content").on("click","#nextPage",function(){
 setInterval(() => {
     if(currentViewName == "photosList"){
         renderPhotosList();
-        console.log("rafraichie periodiquement")
     }
 }, 30*1000);
 async function reloadPhotoObj(photo) {
@@ -1086,7 +1076,6 @@ function renderLoginForm() {
 function getFormData($form) {
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
     var jsonObject = {};
-    console.log($form.serializeArray());
     $.each($form.serializeArray(), (index, control) => {
         jsonObject[control.name] = control.value.replace(removeTag, "");
     });
