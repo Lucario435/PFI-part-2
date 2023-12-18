@@ -1,6 +1,6 @@
 
 
-export function get(photoList,userdatas,loggedUser,CurrentFilter){
+export function get(photoList,userdatas,loggedUser,CurrentFilter,pageActuelle){
     let buildstr = `<div class="pgrid">`;
     //fonction pour filtrer
     switch(CurrentFilter)
@@ -20,7 +20,7 @@ export function get(photoList,userdatas,loggedUser,CurrentFilter){
         //Trier plus aimées
         case "like":
             //filtrage
-            photoList.sort((a, b) => b.likes - a.likes);
+            photoList.sort((a, b) => b.likesCount - a.likesCount);
             break;
 
         //Mes photos
@@ -45,7 +45,13 @@ export function get(photoList,userdatas,loggedUser,CurrentFilter){
         } else buildstr += getTilePhoto(element,userdatas,loggedUser);
         
     });
-    buildstr += "</div>"
+    buildstr += `</div>
+    <div class="centerx">
+    <button class="btn btn-primary" id="previousPage"><</button>
+    <span style="padding: 0 5px; font-weight:bolder;">${pageActuelle}</span>
+    <button class="btn btn-primary" id="nextPage">></button>
+    </div>
+    `
     return buildstr;
 }
 
@@ -98,6 +104,10 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
             height:300px;
             object-fit: cover;
             border-radius:5px;
+        }.centerx{
+            margin-right:auto;
+            margin-left:auto;
+            width:fit-content;
         }
         .pOwnerActions{
             float:right;
@@ -134,6 +144,8 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
             cursor:pointer;
         }
         .pOwner{
+            object-fit: cover;
+            height: 3em;
             width:3rem;
             border-radius:100%;
             float:left;

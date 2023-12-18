@@ -39,7 +39,7 @@ export default
         tokensRepository.keepByFilter(token => token.User.Id != userId);
     }
     static clean() {
-        tokensRepository.keepByFilter(token => token.Expire_Time > now);
+        tokensRepository.keepByFilter(token => token.Expire_Time > utilities.nowInSeconds());
     }
     static find(access_token, renew = true) {
         let token = tokensRepository.findByField('Access_token', access_token);

@@ -21,9 +21,11 @@ let delayTimeOut = 200; // seconds
 let photoContainerWidth = 400;
 let photoContainerHeight = 400;
 let limit;
+let limitPagination = 6;
 let HorizontalPhotosCount;
 let VerticalPhotosCount;
 let offset = 0;
+let currPage =0;
 
 Init_UI();
 function Init_UI() {
@@ -42,7 +44,7 @@ function getViewPortPhotosRanges() {
     VerticalPhotosCount = Math.round($("#content").innerHeight() / photoContainerHeight);
     HorizontalPhotosCount = Math.round($("#content").innerWidth() / photoContainerWidth);
     limit = (VerticalPhotosCount + 1) * HorizontalPhotosCount;
-    console.log("VerticalPhotosCount:", VerticalPhotosCount, "HorizontalPhotosCount:", HorizontalPhotosCount)
+    // console.log("VerticalPhotosCount:", VerticalPhotosCount, "HorizontalPhotosCount:", HorizontalPhotosCount)
     offset = 0;
 }
 // pour la pagination
@@ -180,7 +182,7 @@ function viewMenu(viewName) {
 }
 function connectedUserAvatar() {
     let loggedUser = API.retrieveLoggedUser();
-    // console.log(loggedUser);
+    console.log(loggedUser);
     if (loggedUser)
         return `
             <div class="UserAvatarSmall" userId="${loggedUser.Id}" id="editProfilCmd" style="background-image:url('${loggedUser.Avatar}')" title="${loggedUser.Name}"></div>
@@ -483,6 +485,7 @@ async function renderPhotos() {
     showWaitingGif();
     $("#newPhotoCmd").show();
     $("#abort").hide();
+    currPage =0;
     let loggedUser = API.retrieveLoggedUser();
     if (loggedUser){
         console.log(loggedUser);
@@ -493,28 +496,57 @@ async function renderPhotos() {
     }
     UpdateHeader('Liste des photos', 'photosList')
 }
+function max(a,maxx){
+    if(a > maxx)
+        return maxx;
+    return a;
+}function min(a,minx){
+    if(a > minx)
+        return minx;
+    return a;
+}
+function getCurrPage(){
+    if(currPage <0)
+        currPage =0;
+    return currPage;
+}
 async function renderPhotosList() {
     eraseContent();
-    let r = await API.GetPhotos();
+    let query = `?&limit=${limitPagination}&offset=${getCurrPage()}`;
+    // alert(query);
+    console.log(query);
+    let r = await API.GetPhotos(query);
     let loggedUser = API.retrieveLoggedUser();
+    // if(true){
+    //     let query = `?Shared=true&OwnerId=${loggedUser.Id}&limit=${limitPagination}&offset=${getCurrPage()+1}`;
+    //     let rx = await API.GetPhotos(query);
+    //     if(rx.data){
+    //         r.data.push(...rx.data);
+    //     }
+    // }
+    
     let userdatas = {};
+    let countPhotos =0;
     if (r.data) {
         r.data.forEach(photo => {
             let udata = undefined;
             udata = photo.Owner; //API.GetAccount(photo.OwnerId)
             userdatas[photo.Owner.Id] = udata;
+            countPhotos+=1;
         });
+        // console.log(r.data);
     }
+    
     let nphotos = [];
     r.data.forEach(e => {
         reloadPhotoObj(e).then(s => {
             nphotos.push(s);
-            $("#content").html(getPhotos(nphotos, userdatas, loggedUser, CurrentFilter));
+            $("#content").html(getPhotos(nphotos, userdatas, loggedUser, CurrentFilter, getCurrPage()));
             lsPhotos(renderPhotoDetail, renderDeletePhoto,renderEditPhoto);
             $("#editPhotoCmd").on("click", function () {
                 let balise = $(this);
                 let pid = balise.parent().attr("photoId")
-                console.log("ahhae");
+                // console.log("ahhae");
                 renderEditPhoto(undefined, pid);
             })
             $("#deletePhotoCmd").on("click", function () {
@@ -525,14 +557,44 @@ async function renderPhotosList() {
             $("#content").on("click", "#editPhotoCmd", function (){
                 let balise = $(this);
                 let pid = balise.parent().attr("photoId")
-                console.log("ahhae");
+                // console.log("ahhae");
                 renderEditPhoto(undefined, pid);
             })
+            $("#newPhotoCmd").show();
+    
+    let realcurrphoto = max(countPhotos,limitPagination);
+    // console.log(realcurrphoto +" // "+limitPagination)
+    if(realcurrphoto<limitPagination){
+        $("#previousPage").show();
+        $("#nextPage").hide();
+        // console.log("hid");
+    } else{
+        $("#previousPage").show();
+        $("#nextPage").show();
+    } if(getCurrPage() == 0){
+        $("#previousPage").hide();
+        // console.log("is 0")
+    }
         })
     })
+    
     // UpdateHeader("Liste des photos","photoList");
-    $("#newPhotoCmd").show();
+    
 }
+$("#content").on("click","#previousPage",function(){
+    currPage += -1;
+    renderPhotosList();
+})
+$("#content").on("click","#nextPage",function(){
+    currPage += 1;
+    renderPhotosList();
+})
+setInterval(() => {
+    if(currentViewName == "photosList"){
+        renderPhotosList();
+        console.log("rafraichie periodiquement")
+    }
+}, 30*1000);
 async function reloadPhotoObj(photo) {
     let id = photo.Id;
     return new Promise(async resolve => {
@@ -590,7 +652,7 @@ async function renderPhotoDetail(pid) {
                             }).then((success) => {
                                 if (success != false) {
                                     // console.log("success like:" +success)
-                                    console.log(success);
+                                    // console.log(success);
                                     renderPhotoDetail(pid);
                                 }
     

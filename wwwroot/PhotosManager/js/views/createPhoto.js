@@ -8,7 +8,7 @@ export function get(msg = undefined,EditPhoto = {}){
     // console.log(Image);
     return `
     <form class="form" id="formCPhoto">
-        ${msg != undefined ? '<h4 style="color:red;">'+msg+'</h4>':"" }
+        ${msg != undefined ? '<h4 style="color:red;">'+msg+'</h4><br>':"" }
         <fieldset>
         <legend>Informations</legend>
         <input type="text" class="form-control" placeholder="Titre" name="Title" value="${Title != undefined? Title:""}" />
