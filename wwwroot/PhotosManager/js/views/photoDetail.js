@@ -38,6 +38,9 @@ export function get(photo,loggedUser){
 export function loadScript(){
     $("#content").append(`
     <style>
+    .fa-thumbs-up{
+        cursor:pointer;
+    }
     .dutile{
         margin-top:.5rem;
         display:block;

@@ -485,6 +485,7 @@ async function renderPhotos() {
     $("#abort").hide();
     let loggedUser = API.retrieveLoggedUser();
     if (loggedUser){
+        console.log(loggedUser);
         renderPhotosList();
     }
     else {
@@ -763,7 +764,7 @@ async function renderManageUsers() {
                 users.data.forEach(user => {
                     if (user.Id != loggedUser.Id) {
                         let typeIcon = user.Authorizations.readAccess == 2 ? "fas fa-user-cog" : "fas fa-user-alt";
-                        typeTitle = user.Authorizations.readAccess == 2 ? "Retirer le droit administrateur à" : "Octroyer le droit administrateur à";
+                        let typeTitle = user.Authorizations.readAccess == 2 ? "Retirer le droit administrateur à" : "Octroyer le droit administrateur à";
                         let blockedClass = user.Authorizations.readAccess == -1 ? "class=' blockUserCmd cmdIconVisible fa fa-ban redCmd'" : "class='blockUserCmd cmdIconVisible fa-regular fa-circle greenCmd'";
                         let blockedTitle = user.Authorizations.readAccess == -1 ? "Débloquer $name" : "Bloquer $name";
                         let userRow = `

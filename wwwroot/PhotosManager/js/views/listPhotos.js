@@ -97,15 +97,24 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
             width:100%;
             height:100%;
             object-fit: cover;
+            border-radius:5px;
         }
         .pOwnerActions{
             float:right;
         }
+        .fa-pencil{
+            cursor:pointer;
+        }
+        .fa-trash{
+            cursor:pointer;
+        }
         .tphoto{
-            width:250px;
+            /*width:250px;*/
             height:250px;
             color:var(--blike);
             margin-bottom:4rem;
+            width:100%;
+            color:rgb(0, 87, 204);
             margin-left:.5rem;
             margin-right:.5rem;
             border-radius:5px;
@@ -122,6 +131,7 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
         }
         .pTitle{
             font-weight:bold;
+            color:rgb(0, 87, 204);
         }
         .photoContainer{
             position:relative;
@@ -150,10 +160,12 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
         }
         .pLike{
             float:right;
+            color:rgb(0, 87, 204);
         }
         .pDate{
             width:100%;
             font-size:.8rem;
+            color:rgb(0, 87, 204);
         }
     </style>
     
