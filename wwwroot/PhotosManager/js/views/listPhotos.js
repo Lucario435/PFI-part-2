@@ -1,7 +1,7 @@
 
 
 export function get(photoList,userdatas,loggedUser,CurrentFilter){
-    let buildstr = `<div class="bigContainer">`;
+    let buildstr = `<div class="pgrid">`;
     //fonction pour filtrer
     switch(CurrentFilter)
     {
@@ -40,19 +40,10 @@ export function get(photoList,userdatas,loggedUser,CurrentFilter){
 
     //Affichage
     photoList.forEach(element => {
-<<<<<<< Updated upstream
         if(element.Shared == false && element.OwnerId != loggedUser.Id)
         {
         } else buildstr += getTilePhoto(element,userdatas,loggedUser);
         
-=======
-        console.log(element);
-        //Vérifier si les annonces sont partagé ou à nous
-        if(element.Shared == true || element.OwnerName == loggedUser.Name)
-        {
-            buildstr += getTilePhoto(element,userdatas,loggedUser);
-        }
->>>>>>> Stashed changes
     });
     buildstr += "</div>"
     return buildstr;
@@ -104,7 +95,7 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
         }
         .pImg{
             width:100%;
-            height:100%;
+            height:300px;
             object-fit: cover;
             border-radius:5px;
         }
@@ -118,10 +109,6 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
             cursor:pointer;
         }
         .tphoto{
-            /*width:250px;*/
-            height:250px;
-            color:var(--blike);
-            margin-bottom:4rem;
             width:100%;
             color:rgb(0, 87, 204);
             margin-left:.5rem;
@@ -145,7 +132,6 @@ export function loadScript(renderPhotoDetail,renderDeletePhoto,renderEditPhoto){
         .photoContainer{
             position:relative;
             cursor:pointer;
-            height:100%;
         }
         .pOwner{
             width:3rem;
